@@ -120,7 +120,7 @@ end
 #---- main --------------------------
 options = {
 	:scanDir => ".",
-	:extension => "\.c$",
+	:extension => nil,
 	:recursive => false,
 	:ruleFile => "",
 	:numOfThreads => TaskManagerAsync.getNumberOfProcessor()
@@ -133,7 +133,7 @@ opt_parser = OptionParser.new do |opts|
 		options[:scanDir] = scanDir
 	end
 
-	opts.on("-e", "--extension=", "Specify target file extension (#{options[:extension]})") do |extension|
+	opts.on("-e", "--extension=", "Specify target file extension \\.c$, etc.") do |extension|
 		options[:extension] = extension
 	end
 
