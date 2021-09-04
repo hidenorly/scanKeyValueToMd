@@ -20,6 +20,8 @@ $ ruby scanKeyValue.rb -s . -r samplerule.txt --recursive
 | /Users/.../scanKeyValueToMd/sample.c | Sample | MAX_INPUT | 1 | 1, 2 | 8000, 11025, 12000, 16000, 22050, 24000,32000, 44100, 48000,64000, 88200, 96000 | 8, 16, 24, 32 | 2 | 8000, 11025, 12000, 16000, 22050, 24000,32000, 44100, 48000,64000, 88200, 96000 | 16 | 
 ```
 
+## samplerule.txt
+
 ```samplerule.txt
 Handler_t
     .HandlerName = "@",
@@ -35,6 +37,8 @@ Handler_t
             .SampleRate = {@},
             .BitWidth = {@},
 ```
+
+## sample.c
 
 ```sample.c
 Handler_t _stSampleHandler = { // point is you can specify match condition by what you'd like to interest
