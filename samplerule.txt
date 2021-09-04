@@ -1,0 +1,13 @@
+Handler_t
+    .HandlerName = "@",
+    .HandlerCapability = {
+        .MaxInput = @,
+        .MaxOutput = @,
+        .InputCapability = {
+            .Channel = {@},
+            .SampleRate = {@},
+            .BitWidth = {@},
+        .OutputCapability = {
+            .Channel = {@},
+            .SampleRate = {@},
+            .BitWidth = {@},
