@@ -20,10 +20,11 @@ require './TaskManager'
 require './FileUtil'
 
 class ScanTask < TaskAsync
-	def initialize(path, rule, resultCollector)
+	def initialize(path, rule, resultCollector, robustMode)
 		@path = path
 		@rule = rule
 		@resultCollector = resultCollector
+		@robustMode = robustMode
 		super("ScanTask::#{path}")
 	end
 
@@ -44,11 +45,11 @@ class ScanTask < TaskAsync
 		foundRule = false
 		while (i < body.length) && !foundRule
 			aLine = body[i]
-			keyIndex = aLine.index(key)
+			keyIndex = @robustMode ? StrUtil.robustIndex( key, body, i ) : aLine.index(key)
 			if keyIndex then
 				foundRule = true
 				if valueRequired then
-					value = aLine[ keyIndex+key.length..aLine.length ]
+					value = aLine[ keyIndex+key.length..aLine.length ].to_s
 					if keyEnd then
 						endIndex = value.rindex( keyEnd )
 						if endIndex then
@@ -63,7 +64,10 @@ class ScanTask < TaskAsync
 									value = value.to_s + body[j]
 									j = j + 1
 								end
-								value = value[0..value.rindex( keyEnd )-1]
+								endIndex = value.rindex( keyEnd )
+								if endIndex then
+									value = value[0..endIndex-1]
+								end
 								i = i2 - 1
 							end
 						end
@@ -122,6 +126,7 @@ options = {
 	:scanDir => ".",
 	:extension => nil,
 	:recursive => false,
+	:robust => false,
 	:ruleFile => "",
 	:numOfThreads => TaskManagerAsync.getNumberOfProcessor()
 }
@@ -143,6 +148,10 @@ opt_parser = OptionParser.new do |opts|
 
 	opts.on("", "--recursive", "Specify if you want to search recursively") do |recursive|
 		options[:recursive] = recursive
+	end
+
+	opts.on("", "--robust", "Specify if you want to robust match (experimental)") do |robust|
+		options[:robust] = robust
 	end
 end.parse!
 
@@ -171,7 +180,7 @@ end
 result = ResultCollector.new()
 
 pathes.each do |aPath|
-	taskMan.addTask( ScanTask.new( aPath, rules, result ) )
+	taskMan.addTask( ScanTask.new( aPath, rules, result, options[:robust] ) )
 end
 
 taskMan.executeAll()

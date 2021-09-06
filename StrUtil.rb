@@ -18,4 +18,55 @@ class StrUtil
 		str.encode!("UTF-8", :invalid=>:replace, :undef=>:replace, :replace=>replaceChr) if !str.valid_encoding?
 		return str
 	end
+
+	def self.robustIndex(key, strArray, i)
+		if i < strArray.length then
+			str = strArray[i].to_s
+			index = str.index(key)
+			return index if index
+
+			keys = key.split
+			return nil if keys.length == 1
+
+			found = true
+			index = nil
+			j = 0
+			keys.each do |aKey|
+				index2 = str.index(aKey)
+				if index2 then
+					# found
+					if j == 0 then
+						index = index2
+					end
+				else
+					break if j == 0
+					# not found in current str
+					if (i+1) < strArray.length then
+						# try with next string in the array
+						i = i + 1
+						str = str + strArray[i].to_s
+						index2 = str.index(aKey)
+						if nil == index2 then
+							found = false
+							break
+						else
+							if j == 0 then
+								index = index2
+							end
+						end
+					else
+						found = false
+						break
+					end
+				end
+				break if !found
+				j = j + 1
+			end
+			if found && index then
+				return index
+			end
+		end
+
+		return nil
+	end
 end
