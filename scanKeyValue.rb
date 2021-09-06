@@ -162,7 +162,11 @@ end
 taskMan = TaskManagerAsync.new( options[:numOfThreads].to_i )
 
 pathes = []
-FileUtil.iteratePath(options[:scanDir], options[:extension], pathes, options[:recursive], false)
+if FileTest.directory?( options[:scanDir] ) then
+	FileUtil.iteratePath(options[:scanDir], options[:extension], pathes, options[:recursive], false)
+else
+	pathes.push( options[:scanDir] )
+end
 
 result = ResultCollector.new()
 

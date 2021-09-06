@@ -16,7 +16,7 @@ Usage:
 # How to use and example output
 
 ```
-$ ruby scanKeyValue.rb -r samplerule.txt -s ./sample -e \.c$
+$ ruby scanKeyValue.rb -r samplerule.txt -s ./sample -e \.c$ --recursive
 | /Users/.../scanKeyValueToMd/sample.c | Sample | MAX_INPUT | 1 | 1, 2 | 8000, 11025, 12000, 16000, 22050, 24000,32000, 44100, 48000,64000, 88200, 96000 | 8, 16, 24, 32 | 2 | 8000, 11025, 12000, 16000, 22050, 24000,32000, 44100, 48000,64000, 88200, 96000 | 16 | 
 ```
 
