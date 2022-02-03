@@ -100,23 +100,59 @@ class ScanTask < TaskAsync
 end
 
 class ResultCollector
-	def initialize
+	def initialize( outputFormat, enableFilename )
 		@result = {}
 		@_mutex = Mutex.new
+		@outputFormat = outputFormat
+		@enableFilename = enableFilename
 	end
 	def onResult( path, result )
 		@_mutex.synchronize {
 			@result[ path ] = result
 		}
 	end
-	def dump
+	def dumpMarkdown
 		@result.each do |aPath, result|
-			print "| " + aPath.to_s + " | "
+			if @enableFilename then
+				print "| " + aPath.to_s + " | "
+			else
+				print "| "
+			end
 			result.each do |aValue|
 				print aValue.to_s + " | "
 			end
 			puts ""
 		end
+	end
+	def dumpJson
+		puts "["
+		@result.each do |aPath, result|
+			print "["
+			if @enableFilename then
+				print '''"''' + aPath.to_s + '''",'''
+			end
+			result.each do |aValue|
+				print '''"''' + aValue.to_s + '''",'''
+			end
+			puts "],"
+		end
+		puts "]"
+	end
+	def dumpCsv
+		@result.each do |aPath, result|
+			if @enableFilename then
+				print '''"''' + aPath.to_s + '''",'''
+			end
+			result.each do |aValue|
+				print '''"''' + aValue.to_s + '''",'''
+			end
+			puts ""
+		end
+	end
+	def dump
+		dumpMarkdown() if @outputFormat == "markdown"
+		dumpCsv() if @outputFormat == "csv"
+		dumpJson() if @outputFormat == "json"
 	end
 end
 
@@ -128,6 +164,8 @@ options = {
 	:recursive => false,
 	:robust => false,
 	:ruleFile => "",
+	:outputFormat => "markdown",
+	:enableFilename => true,
 	:numOfThreads => TaskManagerAsync.getNumberOfProcessor()
 }
 
@@ -153,6 +191,16 @@ opt_parser = OptionParser.new do |opts|
 	opts.on("", "--robust", "Specify if you want to robust match (experimental)") do |robust|
 		options[:robust] = robust
 	end
+
+	opts.on("", "--outputFormat=", "Specify markdown or csv or json (default:#{options[:outputFormat]})") do |outputFormat|
+		outputFormat.strip!
+		outputFormat.downcase!
+		options[:outputFormat] = outputFormat if outputFormat == "csv" || outputFormat == "markdown" || outputFormat == "json"
+	end
+
+	opts.on("", "--disableFilenameOutput", "Specify if you don't want to output filename as 1st col.") do |disableFilenameOutput|
+		options[:enableFilename] = false
+	end
 end.parse!
 
 options[:scanDir] = File.expand_path(options[:scanDir])
@@ -177,7 +225,7 @@ else
 	pathes.push( options[:scanDir] )
 end
 
-result = ResultCollector.new()
+result = ResultCollector.new( options[:outputFormat], options[:enableFilename] )
 
 pathes.each do |aPath|
 	taskMan.addTask( ScanTask.new( aPath, rules, result, options[:robust] ) )

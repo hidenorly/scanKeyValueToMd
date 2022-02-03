@@ -11,6 +11,12 @@ Usage:
     -r, --ruleFile=                  Specify rule file (mandatory)
         --recursive
                                      Specify if you want to search recursively
+        --robust
+                                     Specify if you want to robust match (experimental)
+        --outputFormat=
+                                     Specify markdown or csv or json (default:markdown)
+        --disableFilenameOutput
+                                     Specify if you don't want to output filename as 1st col.
 ```
 
 # How to use and example output
